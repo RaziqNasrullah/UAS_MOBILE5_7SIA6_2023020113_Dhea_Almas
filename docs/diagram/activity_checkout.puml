@@ -1,0 +1,51 @@
+@startuml activity_checkout
+title Activity Diagram - Proses Pemesanan / Checkout NeoLearn
+skinparam ActivityBackgroundColor #EAF4FB
+skinparam ActivityBorderColor #1B5E6E
+skinparam ActivityDiamondBackgroundColor #FFF4E6
+
+|Pelanggan|
+start
+:Membuka Katalog / Beranda;
+:Memilih produk & membuka Detail Produk;
+if (Stok / kuota > 0?) then (ya)
+  :Memilih jumlah + menulis catatan item (opsional);
+  :Menekan "Tambah ke Keranjang";
+else (tidak)
+  :Tombol nonaktif\n"Habis" / "Kuota Penuh";
+  stop
+endif
+|Sistem (Flutter + API PHP)|
+:Validasi jumlah <= stok (aplikasi & server);
+:Simpan ke tabel keranjang\n(update badge keranjang);
+|Pelanggan|
+:Membuka Keranjang\n(ubah jumlah +/-, edit catatan);
+:Menekan "Checkout";
+:Mengisi form: nama, no HP, tipe pesanan,\nalamat (jika Diantar), email (jika ada Kelas Kursus), catatan;
+:Menekan "Buat Pesanan";
+|Sistem (Flutter + API PHP)|
+if (Form valid?) then (ya)
+else (tidak)
+  :Tampilkan pesan error validasi;
+  stop
+endif
+:BEGIN TRANSACTION;
+:SELECT keranjang + produk ... FOR UPDATE;
+if (Stok / kuota mencukupi?) then (ya)
+  :Hitung subtotal, biaya layanan Rp2.000,\nongkir Rp10.000 (Diantar), diskon 10% (>= Rp150.000);
+  :Buat nomor INV-YYYYMMDD-NNN;
+  :INSERT pesanan & detail_pesanan\n(snapshot nama & harga);
+  :UPDATE produk SET stok = stok - jumlah;
+  :DELETE keranjang;
+  :COMMIT;
+else (tidak)
+  :ROLLBACK;
+  :Tampilkan "Stok/kuota tidak mencukupi";
+  stop
+endif
+|Pelanggan|
+:Halaman Pesanan Berhasil\n(nomor pesanan & total bayar);
+:Membuka Preview Struk PDF;
+:Simpan ke perangkat / Bagikan;
+stop
+@enduml

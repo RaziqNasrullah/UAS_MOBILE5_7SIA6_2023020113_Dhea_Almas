@@ -263,7 +263,9 @@ class _PendapatanChart extends StatelessWidget {
   Widget build(BuildContext context) {
     if (data.isEmpty) return const _NoData();
     final maxV = data.map((e) => e.pendapatan).fold<double>(0, (a, b) => a > b ? a : b);
-    final top = maxV <= 0 ? 100000.0 : (maxV * 1.2 / 50000).ceil() * 50000.0;
+    // Interval sumbu "rapi" (25rb/50rb/100rb/250rb/...) agar label mudah dibaca.
+    final step = _niceStep(maxV <= 0 ? 100000 : maxV * 1.1 / 4);
+    final top = step * 4;
     final total = data.fold<double>(0, (s, e) => s + e.pendapatan);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -273,8 +275,9 @@ class _PendapatanChart extends StatelessWidget {
           style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.primary),
         ),
         const SizedBox(height: 12),
-        SizedBox(
+        Container(
           height: 200,
+          padding: const EdgeInsets.only(right: 14),
           child: LineChart(
             LineChartData(
               minY: 0,
@@ -283,7 +286,7 @@ class _PendapatanChart extends StatelessWidget {
               maxX: (data.length - 1).toDouble(),
               gridData: FlGridData(
                 drawVerticalLine: false,
-                horizontalInterval: top / 4,
+                horizontalInterval: step,
                 getDrawingHorizontalLine: (_) => const FlLine(color: AppColors.border, strokeWidth: 1),
               ),
               borderData: FlBorderData(show: false),
@@ -314,7 +317,7 @@ class _PendapatanChart extends StatelessWidget {
                   sideTitles: SideTitles(
                     showTitles: true,
                     reservedSize: 42,
-                    interval: top / 4,
+                    interval: step,
                     getTitlesWidget: (v, meta) => SideTitleWidget(
                       meta: meta,
                       child: Text(Formatter.ringkas(v), style: _axisStyle),
@@ -345,8 +348,6 @@ class _PendapatanChart extends StatelessWidget {
               lineBarsData: [
                 LineChartBarData(
                   spots: [for (var i = 0; i < data.length; i++) FlSpot(i.toDouble(), data[i].pendapatan)],
-                  isCurved: true,
-                  preventCurveOverShooting: true,
                   color: AppColors.primary,
                   barWidth: 2,
                   dotData: FlDotData(
@@ -366,6 +367,14 @@ class _PendapatanChart extends StatelessWidget {
       ],
     );
   }
+}
+
+double _niceStep(double raw) {
+  const steps = [25000.0, 50000.0, 100000.0, 250000.0, 500000.0, 1000000.0, 2500000.0, 5000000.0];
+  for (final s in steps) {
+    if (raw <= s) return s;
+  }
+  return (raw / 10000000).ceil() * 10000000.0;
 }
 
 class _KategoriPie extends StatefulWidget {

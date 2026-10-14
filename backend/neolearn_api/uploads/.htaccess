@@ -1,0 +1,10 @@
+# Folder gambar produk.
+# 1) Izinkan gambar diakses lintas origin (berguna jika aplikasi dijalankan di browser).
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+</IfModule>
+# 2) Keamanan: jangan pernah mengeksekusi script di folder upload.
+<FilesMatch "\.(php|phtml|php\d|phar)$">
+    Require all denied
+</FilesMatch>
+Options -Indexes

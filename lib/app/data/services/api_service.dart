@@ -88,7 +88,10 @@ class ApiService {
         'dan firewall mengizinkan Apache.',
       );
     } on http.ClientException catch (e) {
-      throw ApiException('Koneksi ke server gagal: ${e.message}');
+      throw ApiException(
+        'Koneksi ke server $baseUrl gagal (${e.message}). Pastikan XAMPP (Apache & MySQL) aktif '
+        'dan alamat API benar.',
+      );
     } on HandshakeException {
       throw const ApiException('Koneksi aman gagal. Gunakan alamat http:// untuk server lokal XAMPP.');
     }

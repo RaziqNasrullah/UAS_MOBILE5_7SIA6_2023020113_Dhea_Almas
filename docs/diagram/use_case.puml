@@ -1,0 +1,56 @@
+@startuml use_case
+title Use Case Diagram - Aplikasi NeoLearn
+left to right direction
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor #EAF4FB
+  BorderColor #1B5E6E
+}
+skinparam actorStyle awesome
+
+actor "Pelanggan / Pelajar" as P
+actor "Admin Toko" as A
+
+rectangle "NeoLearn - Toko Buku & Perlengkapan Belajar" {
+  usecase "Melihat Beranda\n(sapaan, kategori, best seller)" as UC1
+  usecase "Melihat Katalog Produk" as UC2
+  usecase "Mencari Produk\n(nama / penulis / merek)" as UC3
+  usecase "Memfilter Kategori" as UC4
+  usecase "Melihat Detail Produk" as UC5
+  usecase "Mengelola Keranjang\n(tambah, ubah jumlah, hapus)" as UC6
+  usecase "Menulis Catatan Item" as UC7
+  usecase "Checkout Pesanan" as UC8
+  usecase "Validasi Stok / Kuota" as UC9
+  usecase "Menghitung Biaya\n(layanan, ongkir, diskon)" as UC10
+  usecase "Melihat Riwayat Pesanan" as UC11
+  usecase "Melihat Detail Pesanan" as UC12
+  usecase "Mencetak / Menyimpan\nStruk PDF" as UC13
+  usecase "Mengelola Kategori (CRUD)" as UC14
+  usecase "Mengelola Produk (CRUD)\n+ upload gambar" as UC15
+  usecase "Mengubah Status Pesanan\n(Selesai / Dibatalkan)" as UC16
+  usecase "Mengembalikan Stok\n(pesanan dibatalkan)" as UC17
+  usecase "Melihat Dashboard Penjualan" as UC18
+}
+
+P --> UC1
+P --> UC2
+P --> UC5
+P --> UC6
+P --> UC8
+P --> UC11
+P --> UC13
+UC2 <.. UC3 : <<extend>>
+UC2 <.. UC4 : <<extend>>
+UC6 <.. UC7 : <<extend>>
+UC8 ..> UC9 : <<include>>
+UC8 ..> UC10 : <<include>>
+UC11 ..> UC12 : <<include>>
+
+A --> UC14
+A --> UC15
+A --> UC16
+A --> UC18
+A --> UC11
+A --> UC13
+UC16 <.. UC17 : <<extend>>
+@enduml

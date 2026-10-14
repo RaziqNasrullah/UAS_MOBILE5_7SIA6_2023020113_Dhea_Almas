@@ -1,0 +1,83 @@
+@startuml erd
+title ERD - Database db_neolearn
+hide circle
+skinparam linetype ortho
+skinparam class {
+  BackgroundColor #FFFFFF
+  BorderColor #1B5E6E
+  HeaderBackgroundColor #EAF4FB
+}
+
+entity "kategori" as kategori {
+  * id : INT UNSIGNED <<PK>>
+  --
+  * nama : VARCHAR(100) <<UNIQUE>>
+  deskripsi : VARCHAR(255)
+  ikon : VARCHAR(50)
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "produk" as produk {
+  * id : INT UNSIGNED <<PK>>
+  --
+  * kategori_id : INT UNSIGNED <<FK>>
+  * nama : VARCHAR(150)
+  * harga : DECIMAL(12,2)
+  * stok : INT (>= 0)
+  deskripsi : TEXT
+  gambar : VARCHAR(255)
+  * penulis_merek : VARCHAR(120)
+  * jenjang : ENUM(SD,SMP,SMA/SMK,Perguruan Tinggi,Umum)
+  * format_produk : ENUM(Cetak,E-Book,Barang Fisik,Kelas Online,Kelas Offline)
+  detail_tambahan : VARCHAR(100)
+  is_best_seller : TINYINT(1)
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "keranjang" as keranjang {
+  * id : INT UNSIGNED <<PK>>
+  --
+  * produk_id : INT UNSIGNED <<FK, UNIQUE>>
+  * jumlah : INT (>= 1)
+  catatan_item : VARCHAR(255)
+  created_at : TIMESTAMP
+}
+
+entity "pesanan" as pesanan {
+  * id : INT UNSIGNED <<PK>>
+  --
+  * nomor_pesanan : VARCHAR(20) <<UNIQUE>>
+  * nama_pemesan : VARCHAR(100)
+  * no_hp : VARCHAR(15)
+  email : VARCHAR(120)
+  * tipe_pesanan : ENUM(Ambil di Toko,Diantar,Digital/Kelas Online)
+  alamat : TEXT
+  catatan : VARCHAR(255)
+  subtotal : DECIMAL(12,2)
+  biaya_layanan : DECIMAL(12,2)
+  ongkir : DECIMAL(12,2)
+  diskon : DECIMAL(12,2)
+  total : DECIMAL(12,2)
+  * status : ENUM(Diproses,Selesai,Dibatalkan)
+  * tanggal : DATETIME
+}
+
+entity "detail_pesanan" as detail {
+  * id : INT UNSIGNED <<PK>>
+  --
+  * pesanan_id : INT UNSIGNED <<FK>>
+  produk_id : INT UNSIGNED <<FK, NULL>>
+  * nama_produk : VARCHAR(150) (snapshot)
+  * harga_satuan : DECIMAL(12,2) (snapshot)
+  * jumlah : INT
+  catatan_item : VARCHAR(255)
+  * subtotal : DECIMAL(12,2)
+}
+
+kategori ||--o{ produk : "memiliki\n(ON DELETE RESTRICT)"
+produk ||--o| keranjang : "dimasukkan ke\n(ON DELETE CASCADE)"
+pesanan ||--|{ detail : "berisi\n(ON DELETE CASCADE)"
+produk |o--o{ detail : "tercatat di\n(ON DELETE SET NULL)"
+@enduml
