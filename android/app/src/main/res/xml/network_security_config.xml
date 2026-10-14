@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Mengizinkan HTTP (cleartext) ke server XAMPP lokal, termasuk di APK release.
+  - 10.0.2.2  : localhost laptop dari emulator Android
+  - IP LAN    : laptop saat diakses dari HP fisik (mis. 192.168.x.x)
+  base-config mengizinkan semua host karena IP LAN tiap jaringan berbeda.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system"/>
+        </trust-anchors>
+    </base-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">10.0.2.2</domain>
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">127.0.0.1</domain>
+    </domain-config>
+</network-security-config>
